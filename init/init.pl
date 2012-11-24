@@ -29,7 +29,9 @@ $normal_opt=qq(
 
 $normal_opt=qq(
 -O4
--DNDEBUG
+-Wall
+-std=c++0x
+-fopenmp
 );
     
 $debug_opt ="-g";

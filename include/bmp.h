@@ -24,18 +24,18 @@ extern "C"{
 #include <rgb.h>
 
 
-#define bmp_for2(bmp)	 \
-  for(int y=0;y<bmp.h;y++) \
+#define bmp_for2n(bmp,x,y)    \
+  for(int y=0;y<bmp.h;y++)    \
     for(int x=0;x<bmp.w;x++)
 
-#define bmp_for3(bmp) \
-  for(int y=0;y<bmp.h;y++) \
-    for(int x=0;x<bmp.w;x++) \
+#define bmp_for3n(bmp,x,y,z)                    \
+  for(int y=0;y<bmp.h;y++)                      \
+    for(int x=0;x<bmp.w;x++)                    \
       for(int z=0;z<3;z++)
 
+#define bmp_for2(bmp) bmp_for2n(bmp,x,y)
+#define bmp_for3(bmp) bmp_for3n(bmp,x,y,z)
 #define bmp_for(bmp) bmp_for2(bmp)
-
-
 
 template<class T>
 struct Bitmap{
@@ -53,8 +53,9 @@ struct Bitmap{
   int             init(int w,int h);  
   int             init(const Bitmap& bmp);  
   int             copy(const Bitmap& bmp);
+  //int             copy(const Bitmap& bmp, int tx, int ty, int sx, int sy, int w, int h);
+  int             copy(const Bitmap& bmp, int tx, int ty);
   int             swap(Bitmap& bmp);
-
   
   Bitmap&         operator =  (const Bitmap& b);
   color<T>&       operator [] (int k);
@@ -171,6 +172,17 @@ Bitmap<T>::copy(const Bitmap<T>& bmp){
 
 template<class T>
 int
+Bitmap<T>::copy(const Bitmap<T>& bmp, int tx, int ty) {
+  for (int y=0; y<bmp.h && ty+y<h; y++) {
+    for (int x=0; x<bmp.w && tx+x<w; x++) {
+      rgb[(ty+y)*w+tx+x] = bmp(x,y);
+    }
+  }
+  return 0;
+}
+
+template<class T>
+int
 Bitmap<T>::swap(Bitmap& bmp){
   assert(rgb==NULL);
   assert(bmp.rgb==NULL);
@@ -257,9 +269,10 @@ Bitmap<T>::check(const char* file){
   if(fp==NULL)
     return 0;
   memset(buf,0,sizeof(buf));
-  fread(buf,1,4,fp);
+  int n=fread(buf,1,4,fp);
   fclose(fp);
 
+  if (n!=4) return 0;
   if(buf[0]=='B' &&
      buf[1]=='M')
     return 1;
@@ -284,9 +297,10 @@ Bitmap<T>::read(const char* file,int w,int h){
   std::string fname=file;
   fp=fopen(fname.c_str(),"rb");
   memset(buf,0,sizeof(buf));
-  fread(buf,1,4,fp);
+  int n=fread(buf,1,4,fp);
   fclose(fp);
 
+  if (n!=4) return;
   if(buf[0]=='B' &&
      buf[1]=='M')
     readBmp(fname.c_str());
@@ -322,7 +336,8 @@ Bitmap<T>::readBmp(const char* filename){
   data=(unsigned char*)malloc(size);
   
   fseek(file,0,SEEK_SET);
-  fread(data,size,1,file);
+  int n=fread(data,size,1,file);
+  assert(n==size);
 
   offset=*(int32_t*)(data+10);
   w=*(int32_t*)(data+18);
@@ -404,7 +419,8 @@ Bitmap<T>::readPng(const char* file){
  
   FILE *fp = fopen(file, "rb");
 
-  fread(header, 1, 8, fp);
+  int n=fread(header, 1, 8, fp);
+  assert(n==8);
   assert(png_sig_cmp((png_byte*)header, 0, 8)==0);
 
   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
