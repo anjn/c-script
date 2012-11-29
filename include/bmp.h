@@ -57,7 +57,7 @@ struct Bitmap{
   int             copy(const Bitmap& bmp, int tx, int ty);
   int             swap(Bitmap& bmp);
   
-  Bitmap&         operator =  (const Bitmap& b);
+  //Bitmap&         operator =  (const Bitmap& b);
   color<T>&       operator [] (int k);
   const color<T>& operator [] (int k)const;
   color<T>&       operator () (int x,int y);
@@ -184,8 +184,8 @@ Bitmap<T>::copy(const Bitmap<T>& bmp, int tx, int ty) {
 template<class T>
 int
 Bitmap<T>::swap(Bitmap& bmp){
-  assert(rgb==NULL);
-  assert(bmp.rgb==NULL);
+  assert(rgb!=NULL);
+  assert(bmp.rgb!=NULL);
   assert(bmp.w*bmp.h==w*h);
 
   color<T>* t=rgb;
@@ -197,13 +197,13 @@ Bitmap<T>::swap(Bitmap& bmp){
 
 
 
-template<class T>
-Bitmap<T>&
-Bitmap<T>::operator = (const Bitmap& b){
-  init(b);
-  memcpy(rgb,b.rgb,sizeof(color<T>)*h*w);
-  return *this;
-}
+// template<class T>
+// Bitmap<T>&
+// Bitmap<T>::operator = (const Bitmap& b){
+//   init(b);
+//   memcpy(rgb,b.rgb,sizeof(color<T>)*h*w);
+//   return *this;
+// }
 
 template<class T>
 Bitmap<T>&
@@ -237,24 +237,42 @@ Bitmap<T>::operator [] (int k)const{
 template<class T>
 color<T>&
 Bitmap<T>::operator () (int x,int y){
+  assert(0<=x);
+  assert(x<w);
+  assert(0<=y);
+  assert(y<h);
   return rgb[y*w+x];
 }
 
 template<class T>
 const color<T>&
 Bitmap<T>::operator () (int x,int y)const{
+  assert(0<=x);
+  assert(x<w);
+  assert(0<=y);
+  assert(y<h);
   return rgb[y*w+x];
 }
 
 template<class T>
 T&
 Bitmap<T>::operator () (int x,int y,int z){
+  assert(0<=x);
+  assert(x<w);
+  assert(0<=y);
+  assert(y<h);
+  assert(0<=z&&z<3);
   return rgb[y*w+x][z];
 }
 
 template<class T>
 const T&
 Bitmap<T>::operator () (int x,int y,int z)const{
+  assert(0<=x);
+  assert(x<w);
+  assert(0<=y);
+  assert(y<h);
+  assert(0<=z&&z<3);
   return rgb[y*w+x][z];
 }
   
@@ -282,8 +300,8 @@ Bitmap<T>::check(const char* file){
     return 1;
   else if(buf[0]==0xff &&
 	  buf[1]==0xd8 &&
-	  buf[2]==0xff &&
-	  buf[3]==0xe0 )
+	  buf[2]==0xff /*&&
+          buf[3]==0xe0*/ )
     return 1;
   else
     return 0;
@@ -310,8 +328,8 @@ Bitmap<T>::read(const char* file,int w,int h){
     readPng(fname.c_str());
   else if(buf[0]==(char)0xff &&
 	  buf[1]==(char)0xd8 &&
-	  buf[2]==(char)0xff &&
-	  buf[3]==(char)0xe0 )
+	  buf[2]==(char)0xff /*&&
+          buf[3]==(char)0xe0*/ )
     readJpeg(fname.c_str());
   
   return;
