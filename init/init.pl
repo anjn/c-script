@@ -34,7 +34,10 @@ $normal_opt=qq(
 -fopenmp
 );
     
-$debug_opt ="-g";
+$debug_opt =qq(
+-g
+-std=c++0x
+);
 
 $opt=qq(
 -I$script_home
