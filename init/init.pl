@@ -42,22 +42,22 @@ $debug_opt =qq(
 $opt=qq(
 -I$script_home
 -I$script_home/include
--I$script_home/include/matrix
 -L$script_home
 -I.
 -L.
 );
+#-I$script_home/include/matrix
 
 $libs=qq(
--llapack
--latlas
--lblas
--lgfortran
 -ljpeg
 -lpng
 -lz
 -lm
 );
+#-llapack
+#-latlas
+#-lblas
+#-lgfortran
 
 %autolibs=(
     math.h => '-lm' ,
