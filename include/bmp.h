@@ -354,7 +354,7 @@ Bitmap<T>::readBmp(const char* filename){
   data=(unsigned char*)malloc(size);
   
   fseek(file,0,SEEK_SET);
-  int n=fread(data,size,1,file);
+  int n=fread(data,1,size,file);
   assert(n==size);
 
   offset=*(int32_t*)(data+10);
